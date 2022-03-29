@@ -1,0 +1,4 @@
+Sample 	FastqDNA	FastqRNA	Gillies et al sample name	mon/day/yr	hh:mm	Lat (N)	Lon (E)	Depth (m)	Temp (?C)	Sailinity	Density (kg/L- in situ)*	DO (mg/L)	DO (uM)	DO (mg/kg)	DO (umol/kg)	Chla (ug/L)	PO4 (uM)	Si(OH)4 (uM)	NO3 (uM)	NO2 (uM)	NH4 (uM)
+D1	SRR4342129_	SRR4342137	O12_D'1	23/07/2013	19:08	28.9833	-90.8333	16.5	27.27	35.51	1.023	4.12	128.75	4.21	131.71	0.93	0.58	9.09	3.97	0.84	5.76
+D3	SRR4342133	SRR4342139	H10_D3	23/07/2013	16:14	28.7167	-90.8333	16.16	26.32	34.7	1.023	0.4	12.5	0.41	12.79	0.66	1.9	30.46	13.88	0.86	2.39
+

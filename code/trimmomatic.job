@@ -1,0 +1,20 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J trimmomatic.job
+#SBATCH -t 00:25:00
+
+module load bioinfo-tools
+module load trimmomatic
+
+DIRHOME=/home/alexab/plankton2022
+DIRDATA=$DIRHOME/data/rawdata/3_Thrash_2017/RNA_untrimmed
+DIRRESULTS=$DIRHOME/results/trimmomatic
+
+trimmomatic PE -threads 2 -phred33  $DIRRESULTS/trim_D1.log $DIRDATA/SRR4342137.1.fastq.gz  $DIRDATA/SRR4342137.2.fastq.gz  $DIRRESULTS/SRR4342137.trimmed.fq.gz \
+ILLUMINACLIP:fasta:2:30:15 SLIDINGWINDOW:4:30
+
+
+
