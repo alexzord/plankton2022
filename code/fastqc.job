@@ -1,0 +1,28 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J fastqc
+#SBATCH -t 00:15:00
+
+# Will run FastQC
+# 1st argument = directory containing FastQ files (e.g. data/rawdata/3_Thrash_2017/RNA_untrimmed)
+# 2nd argument = output folder (in the FastQC results directory)
+
+module load bioinfo-tools
+module load FastQC
+
+HOME=/home/alexab/plankton2022
+DIRIN=data/rawdata/3_Thrash_2017/RNA_untrimmed
+DIROUT=RNA_test
+
+if ! [ -d $HOME/results/FastQC ]
+then
+mkdir $HOME/results/FastQC
+fi
+
+mkdir $HOME/results/FastQC/$DIROUT
+cd $HOME/$DIRIN
+fastqc SRR4342137.1.fastq.gz  SRR4342137.2.fastq.gz  SRR4342139.1.fastq.gz  SRR4342139.2.fastq.gz --outdir=$HOME/results/FastQC/$DIROUT
+ 

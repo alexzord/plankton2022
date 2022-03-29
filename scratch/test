@@ -1,0 +1,18 @@
+#!/bin/bash -l
+
+# ignore this
+
+if ! [ -d /home/alexab/plankton2022/rabies ]
+then
+	echo "nnn"
+fi
+
+
+if [ $1 = 5 ]
+then
+        echo $1
+else
+        echo "WHY"
+fi
+
+
