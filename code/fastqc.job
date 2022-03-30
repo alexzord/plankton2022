@@ -14,8 +14,10 @@ module load bioinfo-tools
 module load FastQC
 
 HOME=/home/alexab/plankton2022
-DIRIN=data/rawdata/3_Thrash_2017/RNA_untrimmed
-DIROUT=RNA_test
+DIRIN=$HOME/data/rawdata/3_Thrash_2017/RNA_untrimmed
+DIROUT=RNA_trimmed
+ARCHIVE=SRR4342137
+
 
 if ! [ -d $HOME/results/FastQC ]
 then
@@ -23,6 +25,6 @@ mkdir $HOME/results/FastQC
 fi
 
 mkdir $HOME/results/FastQC/$DIROUT
-cd $HOME/$DIRIN
-fastqc SRR4342137.1.fastq.gz  SRR4342137.2.fastq.gz  SRR4342139.1.fastq.gz  SRR4342139.2.fastq.gz --outdir=$HOME/results/FastQC/$DIROUT
+cd $DIRIN
+fastqc $ARCHIVE.trimmed_fwd_paired.fq.gz $ARCHIVE.trimmed_fwd_unpaired.fq.gz $ARCHIVE.trimmed_rev_paired.fq.gz $ARCHIVE.trimmed_rev_unpaired.fq.gz --outdir=$HOME/results/FastQC/$DIROUT
  
