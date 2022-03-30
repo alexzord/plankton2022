@@ -4,20 +4,15 @@
 #SBATCH -p core
 #SBATCH -n 2
 #SBATCH -J fastqc
-#SBATCH -t 00:15:00
-
-# Will run FastQC
-# 1st argument = directory containing FastQ files (e.g. data/rawdata/3_Thrash_2017/RNA_untrimmed)
-# 2nd argument = output folder (in the FastQC results directory)
+#SBATCH -t 00:59:00
 
 module load bioinfo-tools
 module load FastQC
 
 HOME=/home/alexab/plankton2022
-DIRIN=$HOME/data/rawdata/3_Thrash_2017/RNA_untrimmed
-DIROUT=RNA_trimmed
-ARCHIVE=SRR4342137
-
+PATHIN=$HOME/data/rawdata/3_Thrash_2017/DNA_trimmed
+ARCHIVE=
+DIROUT=DNA_trimmed/$ARCHIVE
 
 if ! [ -d $HOME/results/FastQC ]
 then
@@ -25,6 +20,6 @@ mkdir $HOME/results/FastQC
 fi
 
 mkdir $HOME/results/FastQC/$DIROUT
-cd $DIRIN
-fastqc $ARCHIVE.trimmed_fwd_paired.fq.gz $ARCHIVE.trimmed_fwd_unpaired.fq.gz $ARCHIVE.trimmed_rev_paired.fq.gz $ARCHIVE.trimmed_rev_unpaired.fq.gz --outdir=$HOME/results/FastQC/$DIROUT
+cd $PATHIN
+fastqc SRR4342129_1.paired.trimmed.fastq.gz  SRR4342129_2.paired.trimmed.fastq.gz  SRR4342133_1.paired.trimmed.fastq.gz  SRR4342133_2.paired.trimmed.fastq.gz  --outdir=$HOME/results/FastQC/$DIROUT
  
