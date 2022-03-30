@@ -13,7 +13,7 @@ module load trimmomatic
 DIRHOME=/home/alexab/plankton2022
 DIRDATA=$DIRHOME/data/rawdata/3_Thrash_2017/RNA_untrimmed
 DIRRESULTS=$DIRHOME/results/trimmomatic
-ARCHIVE=SRR4342137
+ARCHIVE=SRR4342139
 ADAPTERS=$DIRHOME/results/adapters/adapters_both.fa
 
 # Check this
@@ -28,9 +28,9 @@ FWDUNPAIRED=$DIRRESULTS/$ARCHIVE.trimmed_fwd_unpaired.fq.gz
 REVPAIRED=$DIRRESULTS/$ARCHIVE.trimmed_rev_paired.fq.gz
 REVUNPAIRED=$DIRRESULTS/$ARCHIVE.trimmed_rev_unpaired.fq.gz
 
-if ! [ -e $DIRRESULTS/trim_D1.log ]
+if ! [ -e $FLOG ]
 then
-touch $DIRRESULTS/trim_D1.log
+touch $FLOG
 fi
 
 
