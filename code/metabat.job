@@ -1,0 +1,30 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J metabat
+#SBATCH -t 12:00:00
+
+module load bioinfo-tools
+module load metabat
+
+HOME=/home/alexab/plankton2022
+ARCHIVE=(SRR4342129 SRR4342133)
+
+if ! [ -d $HOME/results/binning ]
+then
+mkdir $HOME/results/binning
+fi
+
+
+for a in $ARCHIVE
+do
+PATHIN=$HOME/results/assembly/$ARCHIVE/final.contigs.fa
+
+mkdir $HOME/results/binning/$ARCHIVE
+OUTPATH=$HOME/results/binning/$ARCHIVE
+
+metabat -i $PATHIN -a depth.txt -o bin1 --sensitive -l -v --saveTNF saved.tnf --saveDistance saved.gprob
+
+
