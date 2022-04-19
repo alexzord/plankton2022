@@ -1,0 +1,65 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 4
+#SBATCH -J checkm
+#SBATCH -t 02:00:00
+
+module load bioinfo-tools
+module load CheckM/1.1.3
+
+HOME=/home/alexab/plankton2022
+ARCHIVES=(SRR4342129 SRR4342133)
+
+
+mkdir $SNIC_TMP/CheckM_data
+
+#Copy CheckM reference data to cloud
+cp -r $HOME/data/CheckM_data/2015_01_16/* $SNIC_TMP/CheckM_data
+
+#Soft link data to .checkm folder because that is where CheckM is looking... why??
+#ln -s -r $HOME/data/CheckM_data/2015_01_16/* /home/alexab/.checkm
+
+#Set root to temp storage (doesn't work I think)
+checkm data setRoot $SNIC_TMP/CheckM_data
+
+if ! [ -d $HOME/results/checkm ]
+then
+mkdir $HOME/results/checkm
+fi
+
+
+for A in ${ARCHIVES[@]}
+do
+
+#Make directories on temp, copy over input files (contiga and bins)
+SRCPATH=$HOME/results/assembly/$A
+BINPATH=$HOME/results/metabat/$A
+mkdir $SNIC_TMP/$A
+cd $SNIC_TMP/$A
+mkdir ref
+mkdir bins
+mkdir result
+mkdir result/qa
+cp $SRCPATH/final.contigs.fa ref
+cp $BINPATH/bin* .
+
+#Extract contigs sequences based on contig names in bin file
+for bin in bin*
+do
+cat $bin | while read line ; do grep -A1 $line ./ref/final.contigs.fa >> bins/$bin.fa ; done
+done
+
+#CheckM workflow
+checkm lineage_wf -t 4 -x fa --reduced_tree $SNIC_TMP/$A/bins $SNIC_TMP/$A/result
+checkm analyze -t 4 -x fa $SNIC_TMP/$A/result/lineage.ms $SNIC_TMP/$A/bins $SNIC_TMP/$A/result
+checkm qa -t 4 -o 1 -f $SNIC_TMP/$A/result/qa.out $SNIC_TMP/$A/result/lineage.ms $SNIC_TMP/$A/result
+
+#Bring output home
+DIROUT=$HOME/results/checkm/$A
+mkdir $DIROUT
+
+cp -r $SNIC_TMP/$A/result/* $DIROUT
+
+done

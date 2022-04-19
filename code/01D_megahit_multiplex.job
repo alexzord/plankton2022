@@ -1,0 +1,34 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J megahit
+#SBATCH -t 12:00:00
+
+# This script is not working, use the simple megahit script
+
+module load bioinfo-tools
+module load megahit
+
+HOME=/home/alexab/plankton2022
+PATHIN=$HOME/data/rawdata/3_Thrash_2017/DNA_trimmed
+
+ARCHIVES=(SRR4342129 SRR4342133)
+
+if ! [ -d $HOME/results/assembly ]
+then
+mkdir $HOME/results/assembly
+fi
+
+cd $PATHIN
+
+for ARCHIVE in ${ARCHIVES[@]}
+do
+FORWARD=$PATHIN/${ARCHIVE}_1.paired.trimmed.fastq.gz
+REVERSE=$PATHIN/${ARCHIVE}_2.paired.trimmed.fastq.gz
+DIROUT=$HOME/results/assembly/$ARCHIVE
+
+megahit --k-min 65 --k-max 105 --k-step 10 --kmin-1pass -1 $FORWARD -2 $REVERSE -o $DIROUT
+ done
+
