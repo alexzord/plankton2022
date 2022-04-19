@@ -41,11 +41,10 @@ cd $SNIC_TMP/$A
 mkdir ref
 mkdir bins
 mkdir result
-mkdir result/qa
 cp $SRCPATH/final.contigs.fa ref
 cp $BINPATH/bin* .
 
-#Extract contigs sequences based on contig names in bin file
+#Extract contigs sequences based on contig names in bin file, save in a bin_X.fa file
 for bin in bin*
 do
 cat $bin | while read line ; do grep -A1 $line ./ref/final.contigs.fa >> bins/$bin.fa ; done
