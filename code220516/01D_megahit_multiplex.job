@@ -1,0 +1,31 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J megahit
+#SBATCH -t 12:00:00
+
+module load bioinfo-tools
+module load megahit
+
+HOME=/home/alexab/plankton2022
+PATHIN=$HOME/data/rawdata/3_Thrash_2017/DNA_trimmed
+
+ARCHIVES=(SRR4342129 SRR4342133)
+
+if ! [ -d $HOME/results/assembly ]
+then
+mkdir $HOME/results/assembly
+fi
+
+for ARCHIVE in ${ARCHIVES[@]}
+do
+cd $PATHIN
+FORWARD=$PATHIN/${ARCHIVE}_1.paired.trimmed.fastq.gz
+REVERSE=$PATHIN/${ARCHIVE}_2.paired.trimmed.fastq.gz
+DIROUT=$HOME/results/assembly/$ARCHIVE
+
+megahit --kmin-1pass -1 $FORWARD -2 $REVERSE -o $DIROUT
+ done
+

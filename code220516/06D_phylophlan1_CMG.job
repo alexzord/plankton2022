@@ -1,0 +1,41 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J phylCMG
+#SBATCH -t 00:15:00 --qos=short
+
+module load bioinfo-tools
+module load BioBakery
+module load diamond
+module load trimAl
+module load biopython
+module load mash
+
+RESULTS=/home/alexab/plankton2022/results
+ARCHIVES=(SRR4342129 SRR4342133)
+BINS_SRR4342129=(2 3 8 10 11 12) 
+BINS_SRR4342133=(4 5 6 7 9 10 13 17 19 22 29 30) 
+mkdir $RESULTS/phylophlan1_CMG2122
+
+for A in ${ARCHIVES[@]}
+do
+
+BINPATH=$RESULTS/fastabins/${A}
+
+temp=$SNIC_TMP/${A}
+mkdir $temp
+cd $temp
+cp $BINPATH/* .
+ls
+ 
+mkdir result
+
+#phylophlan_metagenomic -i ${PWD} -o result --nproc 2 -d SGB.Jul19
+phylophlan_metagenomic -i ${PWD} -o result --nproc 2 -d CMG2122
+
+mkdir $RESULTS/phylophlan1_CMG2122/${A}
+cp -r result* $RESULTS/phylophlan1_CMG2122/${A}
+
+done

@@ -1,0 +1,52 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J phyl1
+#SBATCH -t 04:00:00
+
+module load bioinfo-tools
+module load BioBakery
+module load diamond
+module load trimAl
+module load biopython
+module load mash
+
+RESULTS=/home/alexab/plankton2022/results
+ARCHIVES=(SRR4342129 SRR4342133)
+BINS_SRR4342129=(2 3 8 10 11 12) 
+BINS_SRR4342133=(4 5 6 7 9 10 13 17 19 22 29 30) 
+mkdir $RESULTS/phylophlan1
+
+for A in ${ARCHIVES[@]}
+do
+
+BINPATH=$RESULTS/metabat/${A}
+
+temp=$SNIC_TMP/${A}
+mkdir $temp
+cp $RESULTS/assembly/${A}/final.contigs.fa $temp
+
+if [ ${A} = SRR4342129 ]; then
+	BINS=${BINS_SRR4342129[@]}
+else
+	BINS=${BINS_SRR4342133[@]}
+fi
+
+mkdir $temp/bins
+for n in ${BINS[@]}
+do
+bin=bin_${n}
+cp $BINPATH/$bin $SNIC_TMP/${A}
+cd $SNIC_TMP/${A}
+cat $bin | while read line ; do grep -A1 $line ./final.contigs.fa >> bins/$bin.fa ; done
+done
+
+cd $SNIC_TMP/${A}
+phylophlan_metagenomic -i ./bins -o result --nproc 2 -d SGB.Jul19
+
+mkdir $RESULTS/phylophlan1/${A}
+cp -r result* $RESULTS/phylophlan1/${A}
+
+done

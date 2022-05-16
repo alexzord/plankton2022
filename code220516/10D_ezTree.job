@@ -1,0 +1,55 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J ezTree
+#SBATCH -t 36:00:00
+
+module load bioinfo-tools hmmer muscle prodigal FastTree
+
+HOME=/home/alexab/plankton2022
+EXTSTR=/proj/genomeanalysis2022/nobackup/work/alexab
+DNAARCHIVES=(SRR4342129 SRR4342133)
+FNAPATH=/home/alexab/plankton2022/results/fastabins2
+GFFPATH=$HOME/results/eggNOGmapper
+OUTPATH=$EXTSTR/eZTree
+
+cd $SNIC_TMP
+cp -r $HOME/code/Gblocks_0.91b .
+cp $HOME/code/ezTree . 
+chmod 555 ezTree ./Gblocks_0.91b/*
+
+touch setting
+echo "[HMMER3] /sw/apps/bioinfo/hmmer/3.2.1/snowy/bin" >> setting
+echo "[MUSCLE] /sw/apps/bioinfo/muscle/3.8.31/snowy" >> setting
+echo "[GBLOCKS] $SNIC_TMP/Gblocks_0.91b" >> setting
+echo "[PRODIGAL] /sw/apps/bioinfo/prodigal/2.6.3/snowy/bin" >> setting
+echo "[FASTTREE] /sw/apps/bioinfo/FastTree/2.1.10/snowy" >> setting
+
+data=$SNIC_TMP/data
+mkdir $data
+
+if ! [ -d $OUTPATH ]
+then
+mkdir $OUTPATH
+fi
+
+cp $HOME/data/refgenomes/ref/*.gz $data
+gunzip $data/*.gz
+
+echo ">>ref<<"
+ls $data
+
+cd $FNAPATH
+cp SRR4342129/* SRR4342133/* $data
+
+cd $SNIC_TMP
+
+ls data/* > $SNIC_TMP/listfile
+echo "final"
+ls data/*
+
+perl ezTree -list listfile -out phyltree -thread 2
+
+cp phyltree* $OUTPATH

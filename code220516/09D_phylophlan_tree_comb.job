@@ -1,0 +1,85 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5 -M snowy
+#SBATCH -p core
+#SBATCH -n 8
+#SBATCH -J phytree
+#SBATCH -t 09:40:00
+
+
+module load bioinfo-tools
+module load iqtree
+module load BioBakery
+
+HOME=/home/alexab/plankton2022
+HOMERES=$HOME/results
+BINPATH=$HOMERES/fastabins2
+REFGEN=$HOME/data/refgenomes/ref
+ARCHIVES=(SRR4342129 SRR4342133)
+
+
+cd $SNIC_TMP
+
+phylophlan_write_config_file -d a --db_aa diamond --map_dna diamond --msa mafft --trim trimal --tree1 iqtree --verbose -o phyloconfig.cfg
+
+ls
+
+temp=$SNIC_TMP/temp
+input=$SNIC_TMP/input
+mkdir $input
+mkdir $temp
+
+cp $REFGEN/* $input
+
+PREFIX=(129 133)
+
+for a in ${!ARCHIVES[@]}
+do
+
+cp $BINPATH/${ARCHIVES[a]}/* $temp
+cd $temp
+bins=$(ls)
+
+for bin in ${bins[@]}
+do
+cd $temp
+newname=${PREFIX[a]}_${bin}
+
+mv $oldname $input/${newname}
+
+done
+done
+
+cd $SNIC_TMP
+
+echo ">>LS SNIC_TMP<<"
+
+ls
+
+echo ">>>LS input<<<"
+
+ls $input
+
+mkdir output
+phylophlan -i $input -d phylophlan -f $SNIC_TMP/phyloconfig.cfg --diversity high --accurate -o output --nproc 8 --verbose 
+
+echo ">>phylophlan_databases"
+ls -l phylophlan_databases
+
+echo ">>phylophlan_databases/phylophlan"
+ls -l phylophlan_databases/phylophlan
+
+echo ">>output"
+ls -l output
+
+echo ">>output/tmp"
+ls -l output/tmp
+
+echo ">>output/tmp/clean_dna"
+ls -l output/tmp/clean_dna
+
+/sw/bioinfo/diamond/2.0.4/snowy/bin/diamond blastx --quiet --threads 1 --outfmt 6 --more-sensitive --id 50 --max-hsps 35 -k 0 --query output/tmp/clean_dna/133_bin_9.fna --db phylophlan_databases/phylophlan/phylophlan.dmnd --out output/tmp/map_dna/133_bin_9.b6o.bkp
+
+ENDRES=/proj/genomeanalysis2022/nobackup/work/alexab/phylophlan_comb
+
+cp $temp/output/* $ENDRES
+

@@ -1,0 +1,44 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5 -M snowy
+#SBATCH -p core
+#SBATCH -n 4
+#SBATCH -J metaphl
+#SBATCH -t 16:00:00
+
+
+module load bioinfo-tools
+module load MetaPhlAn3/3.0.8
+module load BioBakery
+
+HOME=/home/alexab/plankton2022
+OUTPATH=/proj/genomeanalysis2022/nobackup/work/alexab/metaphlan
+READPATH=$HOME/data/rawdata/3_Thrash_2017/DNA_trimmed
+ARCHIVES=(SRR4342129 SRR4342133)
+
+dbdir=$SNIC_TMP/database
+mkdir $dbdir
+
+metaphlan --install --bowtie2db $dbdir
+
+echo ">>>>database<<<<"
+ls $SNIC_TMP/database
+
+if ! [ -d $OUTPATH ]
+then
+mkdir $OUTPATH
+fi
+
+for A in ${ARCHIVES[@]}
+do
+mkdir $SNIC_TMP/${A}
+cd $SNIC_TMP/${A}
+
+cp $READPATH/${A}_* .
+
+metaphlan ${A}_1.paired.trimmed.fastq.gz,${A}_2.paired.trimmed.fastq.gz --bowtie2db $dbdir --bowtie2out ${A}.bowtie2.bz2 --nproc 4 --input_type fastq --add_viruses --biom ${A}.biom -o ${A}_profile.txt
+
+rm ${A}_1.paired.trimmed.fastq.gz ${A}_2.paired.trimmed.fastq.gz
+
+mkdir $OUTPATH/${A}
+cp -r * $OUTPATH/${A}
+done

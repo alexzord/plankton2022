@@ -1,0 +1,59 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J htseqc
+#SBATCH -t 02:00:00
+
+module load bioinfo-tools
+module load samtools
+module load htseq
+
+HOME=/home/alexab/plankton2022
+EXTSTR=/proj/genomeanalysis2022/nobackup/work/alexab
+DNAARCHIVES=(SRR4342129 SRR4342133)
+RNAARCHIVES=(SRR4342137 SRR4342139)
+BAMPATH=$EXTSTR/RNA_mappingX
+GFFPATH=$EXTSTR/cleangff
+OUTPATH=$EXTSTR/htseq_count_newid
+
+temp=$SNIC_TMP/temp
+mkdir $temp
+data=$SNIC_TMP/data
+mkdir $data
+
+if ! [ -d $OUTPATH ]
+then
+mkdir $OUTPATH
+fi
+
+
+for A in ${DNAARCHIVES[@]}
+do
+mkdir $temp/$A
+mkdir $data/$A
+cd $data/$A
+
+cp $BAMPATH/$A/* .
+
+
+for pgff in $(ls $GFFPATH/$A/*.gff)
+do
+cp $pgff .
+gff=${pgff##*/}
+bin=${gff%%.*}
+#sed -e '/^>/,+1d' $gff > 2.${bin}.gff <- to clean gff from contig sequences (not needed for eggNOG .gffs)
+
+PS=(P S)
+for X in ${PS[@]}
+do
+samtools index ${bin}_${X}.bam ${bin}_${X}.bam.bai
+htseq-count -f bam --type CDS --idattr ID ${bin}_${X}.bam ${bin}.newid.gff >> $temp/$A/${bin}_${X}.new.counts.tsv
+done
+done
+done
+
+cp -r $temp/* $OUTPATH
+
+

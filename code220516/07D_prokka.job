@@ -1,0 +1,51 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J prokka
+#SBATCH -t 01:15:00
+
+module load bioinfo-tools
+module load prokka
+
+RESULTS=/home/alexab/plankton2022/results
+FASTA=$RESULTS/fastabins2
+ARCHIVES=(SRR4342129 SRR4342133)
+mkdir $RESULTS/prokka2
+
+BACT129=(bin_2.fa.fna bin_10.fa.fna bin_11.fa.fna)
+ARCH129=(bin_3.fa.fna bin_8.fa.fna bin_12.fa.fna)
+BACT133=(bin_10.fa.fna bin_13.fa.fna bin_17.fa.fna bin_19.fa.fna bin_22.fa.fna bin_29.fa.fna bin_30.fa.fna bin_4.fa.fna bin_5.fa.fna bin_6.fa.fna bin_7.fa.fna)
+ARCH133=(bin_4.fa.fna bin_9.fa.fna)
+
+
+for A in ${ARCHIVES[@]}
+do
+temp=$SNIC_TMP/${A}
+mkdir $temp
+
+cp $FASTA/${A}/* $temp
+
+cd $temp
+mkdir output
+for bin in bin*
+do
+
+nopath=${bin##*/}
+basename=${nopath%%.*}
+
+if { [ ${A} = SRR4342129 ] && [[ "${BACT129[*]}" =~ "${bin}" ]];
+	} || { [[ ${A} = SRR4342133 ]] && [[ "${BACT133[*]}" =~ "${bin}" ]];
+	} ; then
+	prokka --outdir ./output/${bin} --prefix ${basename} --metagenome -cpus 2 $bin
+else
+	prokka --outdir ./output/${bin} --prefix ${basename} --metagenome -cpus 2 --kingdom Archaea $bin
+fi		
+
+done
+
+mkdir $RESULTS/prokka2/${A}
+cp -r $temp/output/* $RESULTS/prokka2/${A}
+
+done

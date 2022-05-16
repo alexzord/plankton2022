@@ -1,0 +1,74 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J bwarna
+#SBATCH -t 02:00:00
+
+module load bioinfo-tools
+module load bwa
+module load samtools
+
+HOME=/home/alexab/plankton2022
+DNAARCHIVES=(SRR4342129 SRR4342133)
+RNAARCHIVES=(SRR4342137 SRR4342139)
+READSPATH=/home/alexab/plankton2022/results/trimmomatic
+OUTPATH=/proj/genomeanalysis2022/nobackup/work/alexab/RNA_mappingX
+
+temp=$SNIC_TMP/temp
+mkdir $temp
+data=$SNIC_TMP/data
+mkdir $data
+
+cp $READSPATH/* $data
+
+if ! [ -d $OUTPATH ]
+then
+mkdir $OUTPATH
+fi
+
+
+for i in ${!DNAARCHIVES[@]}
+do
+cd $SNIC_TMP
+
+PAIRF=$data/${RNAARCHIVES[i]}.trimmed_fwd_paired.fq.gz
+PAIRR=$data/${RNAARCHIVES[i]}.trimmed_rev_paired.fq.gz
+UNPAIRF=$data/${RNAARCHIVES[i]}.trimmed_fwd_unpaired.fq.gz
+UNPAIRR=$data/${RNAARCHIVES[i]}.trimmed_rev_unpaired.fq.gz
+COLLECTION=($PAIRF $PAIRR $UNPAIRF $UNPAIRR)
+
+
+binfolder=$data/${DNAARCHIVES[i]}
+mkdir $binfolder
+cp $HOME/results/fastabins2/${DNAARCHIVES[i]}/* $binfolder
+out=$temp/${DNAARCHIVES[i]}
+mkdir $out
+cd $out
+
+for bin in $binfolder/bin*
+do
+filename=${bin##*/}
+basename=${filename%%.*}
+
+bwa index $bin
+INDEX=(PF PR UF UR)
+for read in ${!COLLECTION[@]}
+do
+bwa aln $bin ${COLLECTION[read]} > ${basename}_${INDEX[read]}.sai
+done
+
+bwa samse $bin ${basename}_UF.sai $UNPAIRF | samtools sort -@ 2 -o ${basename}_UF.bam
+bwa samse $bin ${basename}_UR.sai $UNPAIRR | samtools sort -@ 2 -o ${basename}_UR.bam
+bwa sampe $bin ${basename}_PF.sai ${basename}_PR.sai $PAIRF $PAIRR | samtools sort -@ 2 -o ${basename}_P.bam 
+
+samtools merge ${basename}_S.bam ${basename}_UF.bam ${basename}_UR.bam   
+
+done
+
+mkdir $OUTPATH/${DNAARCHIVES[i]}
+mv *S.bam *P.bam $OUTPATH/${DNAARCHIVES[i]}
+
+done
+

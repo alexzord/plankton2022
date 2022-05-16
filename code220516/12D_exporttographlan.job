@@ -1,0 +1,32 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5 -M snowy
+#SBATCH -p core
+#SBATCH -n 4
+#SBATCH -J expgrap
+#SBATCH -t 00:15:00
+
+conda activate graphlan
+
+cd $SNIC_TMP
+
+HOME=/home/alexab/plankton2022
+EXTSTR=/proj/genomeanalysis2022/nobackup/work/alexab
+OUTPATH=$EXTSTR/pre_graph
+INPATH=$EXTSTR/metaphlan
+ARCHIVES=(SRR4342129 SRR4342133)
+
+
+cd $SNIC_TMP
+
+cp $OUTPATH/* .
+
+for A in ${ARCHIVES[@]}
+do
+
+graphlan_annotate.py ${A}.tree ${A}.annot.xml --annot ${A}.annot
+graphlan.py ${A}.annot.xml ${A}.2.png --dpi 150 --size 14
+
+done
+
+mkdir $OUTPATH
+cp  *.png $OUTPATH
