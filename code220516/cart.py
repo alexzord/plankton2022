@@ -6,6 +6,18 @@ This script requires BioBakery module (simplest to load) to run on Uppmax
 
 CHANGE E-MAIL IN CONFIG SECTION BEFORE RUNNING!
 
+Basic usage (if never used before): python cart.py -r -i request.txt -o refgenomes
+    -r will download reference lists
+
+    -i request.txt is an input tab-separated file following the (example) structure:
+    Taxon   n_genomes
+    p__Proteobacteria	6
+    g__Pelagibacter 2
+    ...
+
+    -o refgenomes is the output folder
+    
+    
 cart.py [-h] -i INPUT [-r [Null->auto-download, else->give path]] [-o [output folder]]
 [--inheader [header lines in input (default = 1)]] [--no-inheader]
 [--refheader [header lines in reference (default = 3]] [--no-refheader] [--pool (-> pool genomes for every species)]
