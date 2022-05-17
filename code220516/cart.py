@@ -17,15 +17,6 @@ cart.py [-h] [-a [get .faa instead of .fna]]-i INPUT [-r [Null->auto-download re
 [--inheader [header lines in input (default = 1)]] [--no-inheader]
 [--refheader [header lines in reference (default = 3]] [--no-refheader] [--pool (-> pool genomes for every species)]
 """
-## Config
-# Required
-email ="brownie.chocolate@hotmail.com"
-Entrez.email = email
-# Can be changed via command line arguments
-home = '/home/alexab/plankton2022' #only used here
-outfolder = home+'/data/refgenomes' #where to save (change via '-o' argument)
-ref = home + '/data/refgenomes/source/taxa2genomes_cpa201901_up201901.txt' #where to find ref (change via '-r' argument)
-
 ## Required libraries
 
 import random
@@ -37,6 +28,14 @@ import argparse
 from datetime import datetime
 from Bio import Entrez
 
+## Config - EDIT THIS
+# Required
+email ="brownie.chocolate@hotmail.com"
+Entrez.email = email
+# Can be changed via command line arguments
+home = '/home/alexab/plankton2022' #only used here
+outfolder = home+'/data/refgenomes' #where to save (change via '-o' argument)
+ref = home + '/data/refgenomes/source/taxa2genomes_cpa201901_up201901.txt' #where to find ref (change via '-r' argument)
 
 ## FUNCTIONS
 ## Get readable file size
