@@ -2,12 +2,11 @@
 #SBATCH -A uppmax2022-2-5 -M snowy
 #SBATCH -p core
 #SBATCH -n 6
-#SBATCH -J phylogenetic
-#SBATCH -t 20:00:00
+#SBATCH -J phyloP
+#SBATCH -t 06:00:00
 
 module load bioinfo-tools phylophlan/0.99 python/2.7.15 biopython/1.73 FastTree muscle/3.8.31 usearch/5.2.32
 
-# Sequence directories
 HOME=/home/alexab/plankton2022/
 FAADIR=$HOME/results/prokka2/
 OUTDIR=/proj/genomeanalysis2022/nobackup/work/alexab/phylophlan99
@@ -17,8 +16,10 @@ input=$SNIC_TMP/input
 mkdir $input
 project=$input/plankton
 mkdir $project
- 
-cp -r /sw/apps/bioinfo/phylophlan/0.99/rackham/bin/* $SNIC_TMP
+
+cd $SNIC_TMP
+cp -r /sw/apps/bioinfo/phylophlan/0.99/rackham/bin/* .
+
 
 for A in ${ARCHIVES[@]}; do
 cd $FAADIR/$A
@@ -36,8 +37,12 @@ echo ">>ls data<<"
 ls $project
 
 cd $SNIC_TMP
+chmod 777 phylophlan.py
 phylophlan.py -i plankton -t --nproc 6
 
-if ! [ -d $OUTDIR ]; then; mkdir $OUTDIR; fi
+if ! [ -d $OUTDIR ]
+then
+mkdir $OUTDIR
+fi
 
 cp -r $SNIC_TMP/output/plankton/* $OUTDIR
