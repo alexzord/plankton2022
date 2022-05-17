@@ -77,6 +77,8 @@ parser.add_argument('-r', '--get_reference', default=ref, nargs='?', const=True,
                          'Default personalized in source code')
 parser.add_argument('-o', '--output', nargs='?', const='.', default=outfolder,
                     help='Output directory')
+parser.add_argument('-a', '--aminoacid', action='store_true', default=False,
+                    help='Get amino acid sequence')
 
 # Input header settings
 parser.add_argument('--inheader', default='1', nargs='?', const='1', type=int,
@@ -93,6 +95,9 @@ parser.add_argument('--no-refheader', dest='refheader', action='store_false',
 parser.add_argument('--pool', action='store_true', help='pool assemblies for a taxon match (decreases variety)')
 
 args = parser.parse_args()
+
+# Aminoacids or genomes
+getaa = args.aminoacid
 
 ## Inputs
 if args.get_reference == True:
