@@ -1,9 +1,13 @@
 """
 Reference assemblyID lists can be downloaded from phylophlan server:
 http://cmprod1.cibio.unitn.it/databases/PhyloPhlAn/taxa2genomes.txt
-This script requires BioBakery module (simplest to load) to run on Uppmax
+Script will do it automatically with -r flag
+
+This script requires biopython (v1.78 works)
 CHANGE E-MAIL IN CONFIG SECTION BEFORE RUNNING!
-Basic usage (if never used before): python cart.py -r -i request.txt -o refgenomes
+
+EXAMPLE Basic usage (if never used before):
+    python cart.py -r -i request.txt -o refgenomes
     -r will download reference lists
     -i request.txt is an input tab-separated file following the (example) structure:
     Taxon   n_genomes
@@ -12,7 +16,13 @@ Basic usage (if never used before): python cart.py -r -i request.txt -o refgenom
     ...
     -o refgenomes is the output folder
     
-    
+Repeated use (same work dir):
+    python cart.py -i request.txt -o refgenomes
+    (skip the reference list download, should work with -r but sometimes doesn't) 
+
+Issue 1) Too many genome requests make NCBI angry. Loop over a more modest request file instead.
+Issue 2) The summary file is provisional. Not all species have standard taxonomy structure so header might not always be correct. 
+
 cart.py [-h] [-a [get .faa instead of .fna]]-i INPUT [-r [Null->auto-download reflist, else->give path]] [-o [output folder]]
 [--inheader [header lines in input (default = 1)]] [--no-inheader]
 [--refheader [header lines in reference (default = 3]] [--no-refheader] [--pool (-> pool genomes for every species)]
@@ -35,7 +45,7 @@ Entrez.email = email
 # Can be changed via command line arguments
 home = '/home/alexab/plankton2022' #only used here
 outfolder = home+'/data/refgenomes' #where to save (change via '-o' argument)
-ref = home + '/data/refgenomes/source/taxa2genomes_cpa201901_up201901.txt' #where to find ref (change via '-r' argument)
+ref = 'taxa2genomes_cpa201901_up201901.txt' #where to find ref (change via '-r' argument)
 
 ## FUNCTIONS
 ## Get readable file size

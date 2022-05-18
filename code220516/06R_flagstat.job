@@ -1,0 +1,33 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5
+#SBATCH -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J samflag
+#SBATCH -t 02:00:00
+
+module load bioinfo-tools
+module load samtools
+BAMPATH=/proj/genomeanalysis2022/nobackup/work/alexab/RNA_mappingX
+ARCHIVES=(SRR4342129 SRR4342133)
+
+mkdir /home/alexab/plankton2022/results/flagstat
+
+for A in ${ARCHIVES[@]}
+do
+cd $SNIC_TMP
+mkdir $A
+cd $A
+cp $BAMPATH/$A/* .
+touch ${A}.stats
+for bam in *.bam
+do
+echo $bam > ${A}.stats
+samtools flagstat $bam >> ${A}.stats
+done
+cp ${A}.stats /home/alexab/plankton2022/results/flagstat
+done
+
+
+
+
