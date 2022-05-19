@@ -1,0 +1,52 @@
+#!/bin/bash -l
+#SBATCH -A uppmax2022-2-5 -M snowy
+#SBATCH -p core
+#SBATCH -n 2
+#SBATCH -J coverg
+#SBATCH -t 06:00:00
+
+module load bioinfo-tools samtools BEDTools R R_packages/4.1.1
+
+HOME=/home/alexab/plankton2022/
+BAMDIR=/proj/genomeanalysis2022/nobackup/work/alexab/RNA_mappingX
+OUTDIR=/proj/genomeanalysis2022/nobackup/work/alexab/RNAmapVIS
+ARCHIVES=(SRR4342129 SRR4342133)
+
+mkdir $OUTDIR
+
+
+for A in ${ARCHIVES[@]}
+do
+mkdir $OUTDIR/$A
+cd $SNIC_TMP
+mkdir $A
+cd $A
+cp $BAMDIR/$A/* .
+cp $HOME/code/coverage_view.R .
+for bin in $(ls *_P.bam)
+do
+end=${bin#*_}
+number=${end%%_*}
+P=bin_${number}_P.bam
+S=bin_${number}_S.bam
+
+samtools merge bin_${number}_M.bam $P $S
+rm $P $S
+done
+
+for bin in *.bam
+do
+samtools index -b $bin
+bedtools bamtobed -i $bin > $bin.bed
+
+Rscript coverage_view.R $bin $bin.bed $bin.png
+
+cp $bin.png $OUTDIR/$A
+
+done
+done
+
+
+
+
+
