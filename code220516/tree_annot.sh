@@ -41,5 +41,5 @@ sed -i '$ d' genomelist.sum
 cut -f 2,8 genomelist.sum > tree.annot
 
 # Clean up
-rm genomelist.match genomelist.temp genomelist.clean genomelist.comb genomelist.sum
+#rm genomelist.match genomelist.temp genomelist.clean genomelist.comb genomelist.sum
 
