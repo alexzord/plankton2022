@@ -38,7 +38,7 @@ join -j 1 -t $'\t'  <(sort -k1 genomelist.comb) <(sort -k1 summary.txt) >> genom
 sed -i '$ d' genomelist.sum 
 
 # Extract needed columns
-cut -f 2,7 genomelist.sum > tree.annot
+cut -f 2,8 genomelist.sum > tree.annot
 
 # Clean up
 rm genomelist.match genomelist.temp genomelist.clean genomelist.comb genomelist.sum
