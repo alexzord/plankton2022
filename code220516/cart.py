@@ -40,7 +40,7 @@ from Bio import Entrez
 
 ## Config - EDIT THIS
 # Required
-email ="brownie.chocolate@hotmail.com"
+email ="your@email.com"
 Entrez.email = email
 # Can be changed via command line arguments
 home = '/home/alexab/plankton2022' #only used here
